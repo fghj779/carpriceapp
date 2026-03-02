@@ -1,85 +1,61 @@
-# Used Car Valuation & Marketplace (carpriceapp)
+# carpriceapp
 
-This repository contains a technical baseline for a dual-mode used-car valuation application.
-It includes:
+Runnable baseline for a dual-mode used-car valuation app (Buyer/Seller).
 
-- PostgreSQL schema for users, vehicles, and market data
-- Python valuation engine and personalization utilities
-- React buyer/seller dashboard component
+## What’s in this repo
 
-## Database schema
+- `db/schema.sql`: PostgreSQL schema (users, vehicles, market data, valuations)
+- `backend/valuation.py`: valuation engine and depreciation calculation
+- `backend/recommendation.py`: personalization and recommendation helpers
+- `backend/app.py`: FastAPI API for valuation + recommendations
+- `backend/requirements.txt`: Python dependencies
+- `backend/run.sh`: local API start script
+- `frontend/index.html`: runnable React dashboard (zero build setup)
 
-`db/schema.sql` defines:
+## Quick local run
 
-- `users`: age, country, preferred car segments, role
-- `vehicles`: VIN, make, model, year, mileage, and condition grade
-- `market_data`: regional price trends and brand-level depreciation constants
-- `valuations`: valuation history per request
+1. Create and activate your virtual environment.
+2. Install API dependencies:
 
-See schema details in `db/schema.sql`.
+```bash
+python3 -m pip install -r backend/requirements.txt
+```
 
-## Valuation logic
+3. Start the backend:
 
-`backend/valuation.py` implements:
+```bash
+bash backend/run.sh
+```
 
-- Piece-wise age depreciation:
-  - 15% for first year
-  - 10% for years after the first
-- Mileage factor and accident-based condition factor
-- Regional + segment adjustment (e.g., UAE SUV bias, Korea compact bias)
-- Returns both:
-  - `current_value`
-  - `total_depreciation`
+4. Open dashboard:
 
-## API contracts (summary)
+```
+http://127.0.0.1:8000
+```
 
-### User
-- `POST /api/v1/users`  
-  Create a user profile.
-- `PATCH /api/v1/users/{user_id}`  
-  Update profile data (age, country, role, preferred segments, occupation, income).
+## Useful endpoints
 
-### Vehicles
-- `POST /api/v1/vehicles`  
-  Register or upsert a vehicle by VIN with metadata.
-- `GET /api/v1/vehicles/{vehicle_id}`  
-  Fetch canonical vehicle record.
+- `GET /health` → service status
+- `GET /` → React dashboard page
+- `POST /api/v1/users`
+- `GET /api/v1/users/{user_id}`
+- `PATCH /api/v1/users/{user_id}`
+- `POST /api/v1/vehicles`
+- `GET /api/v1/vehicles/{vehicle_id}`
+- `POST /api/v1/valuation/estimate`
+- `GET /api/v1/recommendations/buyer?user_id=<id>&top_k=6`
+- `GET /api/v1/recommendations/seller/{vehicle_id}?user_id=<id>&purchase_price=...`
+- `GET /api/v1/market/{country}/trends`
+- `GET /api/v1/demo/bootstrap` → preloaded demo payload for frontend
+- `GET /docs` → interactive OpenAPI docs
 
-### Valuation
-- `POST /api/v1/valuation/estimate`  
-  Estimate value and depreciation for buyer/seller context.
+## Default seeded data
 
-Request body:
-- `user_id`
-- `vehicle_id`
-- `mode: buyer|seller`
-- `base_price`
-- `age_years`
-- `mileage`
-- `accident_history_severity`
-- `regional_demand_factor`
+- User and listing records are preloaded to make the demo run immediately.
+- The dashboard fetches `/api/v1/demo/bootstrap` on load and connects to recommendation endpoints directly.
 
-Response includes:
-- `common`: `current_value`, `total_depreciation`, `depreciation_percent`, component factors
-- buyer extras: fair-value band and risk signals
-- seller extras: value-loss guidance and market-timing signal
+## Notes
 
-### Recommendations
-- `GET /api/v1/recommendations/buyer`  
-  Personalized listing candidates for buyer mode.
-- `GET /api/v1/recommendations/seller/{vehicle_id}`  
-  Seller-oriented recommendations (time-to-sell + target asking corridor).
-- `GET /api/v1/market/{country}/trends`  
-  Returns trend series for chart rendering.
-
-## Frontend
-
-`frontend/UsedCarDashboard.jsx` provides mode switching between:
-- Buyer View:
-  - Best-value recommendations
-  - Personalized budget from profile
-  - Regional price trend chart
-- Seller View:
-  - Value loss tracker (per 1,000km)
-  - Optimal selling time from demand trend
+- The frontend is a lightweight React page loaded from CDN and rendered with Babel in-browser.
+- For production use, move frontend to a compiled React app and replace CDN/Babel with a bundler.
 

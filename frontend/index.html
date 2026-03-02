@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>carpriceapp Dashboard</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(140deg, #eff6ff, #ecfeff);
+      }
+      #root {
+        padding: 20px;
+      }
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      button {
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 8px 14px;
+        margin-right: 8px;
+        cursor: pointer;
+      }
+      button.active {
+        border-color: #1d4ed8;
+        color: #1d4ed8;
+        background: #dbeafe;
+      }
+      .meta {
+        background: #ffffff;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .item {
+        padding: 8px 0;
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      svg {
+        width: 100%;
+        height: 240px;
+      }
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useEffect, useMemo, useState } = React;
+
+      const toMoney = (v) =>
+        new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
+
+      function TrendChart({ data, dataKey, yLabel }) {
+        const width = 560;
+        const height = 230;
+        const pad = 24;
+        const values = data.map((d) => Number(d[dataKey]) || 0);
+        if (!values.length) return <p>No trend data</p>;
+
+        const minV = Math.min(...values);
+        const maxV = Math.max(...values);
+        const scaleV = maxV === minV ? 1 : maxV - minV;
+        const xStep = (width - pad * 2) / Math.max(data.length - 1, 1);
+        const y = (v) => pad + ((maxV - v) * (height - pad * 2)) / scaleV;
+
+        const points = data
+          .map((d, i) => `${pad + i * xStep},${y(d[dataKey])}`)
+          .join(" ");
+        const baselineY = y(minV);
+
+        return (
+          <svg viewBox={`0 0 ${width} ${height}`}>
+            <rect x={pad} y={pad} width={width - pad * 2} height={height - pad * 2} fill="#f8fafc" />
+            <polyline
+              fill="none"
+              stroke="#2563eb"
+              strokeWidth="2.8"
+              points={points}
+            />
+            <text x={pad} y={14} fill="#334155" fontSize="12">
+              {yLabel}
+            </text>
+            {data.map((d, i) => {
+              const x = pad + i * xStep;
+              return (
+                <g key={d.month}>
+                  <line x1={x} y1={pad} x2={x} y2={height - pad} stroke="#e2e8f0" />
+                  <text x={x - 10} y={height - 6} fill="#475569" fontSize="11">
+                    {d.month}
+                  </text>
+                </g>
+              );
+            })}
+            <line x1={pad} y1={height - pad} x2={width - pad} y2={height - pad} stroke="#94a3b8" />
+            <line x1={pad} y1={pad} x2={pad} y2={height - pad} stroke="#94a3b8" />
+            <text x={width - 120} y={pad + 16} fill="#334155" fontSize="11">
+              min {minV.toFixed(2)}
+            </text>
+            <text x={width - 120} y={height - 12} fill="#334155" fontSize="11">
+              max {maxV.toFixed(2)}
+            </text>
+            <path d={`M ${pad} ${baselineY} L ${width - pad} ${baselineY}`} stroke="#e2e8f0" />
+          </svg>
+        );
+      }
+
+      function App() {
+        const [mode, setMode] = useState("buyer");
+        const [bootstrap, setBootstrap] = useState(null);
+        const [buyerList, setBuyerList] = useState([]);
+        const [sellerPayload, setSellerPayload] = useState(null);
+
+        useEffect(() => {
+          (async () => {
+            const b = await fetch("/api/v1/demo/bootstrap").then((r) => r.json());
+            setBootstrap(b);
+          })();
+        }, []);
+
+        useEffect(() => {
+          if (!bootstrap?.user) return;
+          const userId = bootstrap.user.user_id;
+          if (mode === "buyer") {
+            (async () => {
+              const res = await fetch(
+                `/api/v1/recommendations/buyer?user_id=${encodeURIComponent(
+                  userId
+                )}&top_k=6`
+              ).then((r) => r.json());
+              setBuyerList(res.recommendations || []);
+              setSellerPayload(null);
+            })();
+          } else {
+            (async () => {
+              const vehicleId = bootstrap.vehicle_id;
+              const owned = bootstrap.owned_vehicle || {};
+              const res = await fetch(
+                `/api/v1/recommendations/seller/${encodeURIComponent(
+                  vehicleId
+                )}?user_id=${encodeURIComponent(userId)}&purchase_price=${
+                  owned.purchase_price || 0
+                }&purchase_mileage=${owned.purchase_mileage || 0}&current_mileage=${
+                  owned.current_mileage || 0
+                }`
+              ).then((r) => r.json());
+              setSellerPayload(res);
+              setBuyerList([]);
+            })();
+          }
+        }, [mode, bootstrap]);
+
+        const user = bootstrap?.user;
+        const trend = bootstrap?.market_trend || [];
+        const preferredSegments = useMemo(() => {
+          if (!user?.preferred_car_segments) return [];
+          return user.preferred_car_segments.join(", ");
+        }, [user]);
+
+        if (!bootstrap || !user) {
+          return <p>Loading dashboard…</p>;
+        }
+
+        const budget = bootstrap?.personalized_budget ?? 12000;
+        const vehicleIds = (bootstrap.listings || []).map((x) => x.vehicle_id).join(", ");
+        return (
+          <div>
+            <header className="toolbar">
+              <h2>Used Car Valuation Dashboard</h2>
+              <div>
+                <button
+                  className={mode === "buyer" ? "active" : ""}
+                  onClick={() => setMode("buyer")}
+                >
+                  Buyer Mode
+                </button>
+                <button
+                  className={mode === "seller" ? "active" : ""}
+                  onClick={() => setMode("seller")}
+                >
+                  Seller Mode
+                </button>
+              </div>
+            </header>
+
+            <section className="meta">
+              <p>
+                User {user.user_id.slice(0, 8)} · Country: {user.country} · Age: {user.age}
+              </p>
+              <p>
+                Personalized budget: {toMoney(budget)} · Segments: {preferredSegments}
+              </p>
+              <p>Available listings count: {bootstrap.listings.length}</p>
+            </section>
+
+            {mode === "buyer" ? (
+              <section className="grid">
+                <article className="card">
+                  <h3>Best Value Recommendations</h3>
+                  {buyerList.length === 0 ? (
+                    <p>No recommendations for current filters.</p>
+                  ) : (
+                    buyerList.map((rec) => (
+                      <div key={rec.vehicle_id} className="item">
+                        <span>
+                          {rec.title} · {rec.segment}
+                        </span>
+                        <strong>
+                          {toMoney(rec.price_usd)} · score {rec.score}
+                        </strong>
+                      </div>
+                    ))
+                  )}
+                </article>
+
+                <article className="card">
+                  <h3>Regional Price Trend</h3>
+                  <TrendChart data={trend} dataKey="avg_price" yLabel="avg_price" />
+                </article>
+              </section>
+            ) : (
+              <section className="grid">
+                <article className="card">
+                  <h3>Value Loss Tracker</h3>
+                  {!sellerPayload ? (
+                    <p>Waiting on seller forecast…</p>
+                  ) : (
+                    <>
+                      <p>
+                        Net return range: {toMoney(sellerPayload.expected_net_return_range.low)} ~{" "}
+                        {toMoney(sellerPayload.expected_net_return_range.high)}
+                      </p>
+                      <p>Time to sell: {sellerPayload.time_to_sell_days} days</p>
+                      <p>Loss total: {toMoney(sellerPayload.value_loss.total)}</p>
+                      <p>Loss per 1,000 km: {toMoney(sellerPayload.value_loss.per_1000km)}</p>
+                    </>
+                  )}
+                </article>
+                <article className="card">
+                  <h3>Optimal Selling Time</h3>
+                  {!sellerPayload ? (
+                    <p>Waiting on demand forecast…</p>
+                  ) : (
+                    <>
+                      <p>Market demand index: {sellerPayload.market_demand}</p>
+                      <p>Tracked vehicles: {vehicleIds}</p>
+                      <TrendChart data={trend} dataKey="demand" yLabel="demand_index" />
+                    </>
+                  )}
+                </article>
+              </section>
+            )}
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
