@@ -5,7 +5,7 @@ f(region_segment)
 """
 
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, List
 
 
 COUNTRY_SEGMENT_DEMAND = {
@@ -132,3 +132,47 @@ def estimate_current_value(payload: VehicleValuationInput) -> Dict[str, float]:
         "region_segment_factor": round(region_f, 6),
     }
 
+
+def estimate_depreciation_projection(
+    payload: VehicleValuationInput,
+    years: int = 5,
+    annual_mileage_km: float = BASELINE_ANNUAL_KM,
+) -> List[Dict[str, float]]:
+    """Project market value for the next N years.
+
+    Each projection keeps accident severity and region/segment multipliers constant
+    while age and mileage increase with time.
+    """
+    if years <= 0:
+        return []
+
+    base = estimate_current_value(payload)
+    base_value = base["current_value"]
+    baseline_mileage = float(payload.mileage_km)
+    prev_value = base_value
+
+    rows: List[Dict[str, float]] = []
+    for year in range(1, years + 1):
+        projected_payload = VehicleValuationInput(
+            base_price=payload.base_price,
+            age_years=payload.age_years + year,
+            mileage_km=baseline_mileage + annual_mileage_km * year,
+            accident_history_severity=payload.accident_history_severity,
+            regional_demand_factor=payload.regional_demand_factor,
+            country_code=payload.country_code,
+            segment=payload.segment,
+        )
+        projected = estimate_current_value(projected_payload)
+        projected_value = projected["current_value"]
+        yearly_loss = round(prev_value - projected_value, 2)
+        rows.append(
+            {
+                "year": year,
+                "estimated_value": projected_value,
+                "annual_depreciation": max(0.0, yearly_loss),
+                "cumulative_depreciation": round(base_value - projected_value, 2),
+            }
+        )
+        prev_value = projected_value
+
+    return rows

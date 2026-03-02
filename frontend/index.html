@@ -8,65 +8,282 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
+      :root {
+        --bg: #eef2ff;
+        --bg-2: linear-gradient(140deg, #e0f2fe, #f8fafc 52%, #fef3c7);
+        --card: #ffffff;
+        --line: #dbeafe;
+        --text: #0f172a;
+        --muted: #475569;
+        --primary: #1e3a8a;
+        --primary-soft: #dbeafe;
+        --success: #065f46;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
         padding: 0;
-        font-family: "Inter", "Segoe UI", Arial, sans-serif;
-        background: linear-gradient(140deg, #eff6ff, #ecfeff);
+        font-family: "Noto Sans KR", "Trebuchet MS", "Segoe UI", sans-serif;
+        background: var(--bg-2);
+        color: var(--text);
       }
+
       #root {
-        padding: 20px;
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 18px;
       }
-      .toolbar {
+
+      .topbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 12px;
+        padding: 14px;
+        background: #f8fafc;
+        border: 1px solid var(--line);
+        border-radius: 12px;
       }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      h2,
+      h3,
+      h4,
+      h5,
+      p {
+        margin-top: 0;
+      }
+
+      button,
+      select,
+      input,
+      textarea {
+        font: inherit;
+      }
+
       button {
         border: 1px solid #cbd5e1;
-        background: #ffffff;
+        background: #fff;
         border-radius: 8px;
         padding: 8px 14px;
-        margin-right: 8px;
         cursor: pointer;
       }
-      button.active {
-        border-color: #1d4ed8;
-        color: #1d4ed8;
-        background: #dbeafe;
+
+      button:hover {
+        border-color: var(--primary);
       }
-      .meta {
-        background: #ffffff;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        padding: 12px;
+
+      button.active {
+        border-color: var(--primary);
+        background: var(--primary-soft);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .button-row button + button {
+        margin-left: 8px;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .panel-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
         margin-bottom: 12px;
       }
-      .grid {
+
+      .panel-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
       }
-      .card {
-        background: #fff;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        padding: 12px;
+
+      .panel-grid-1 {
+        display: grid;
+        gap: 12px;
       }
-      .item {
-        padding: 8px 0;
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .kpi {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 8px;
+        background: #f8fafc;
+      }
+
+      .kpi strong {
+        color: var(--primary);
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .form-grid label {
+        font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .form-grid input,
+      .form-grid select,
+      .community-form input,
+      .community-form textarea {
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 8px;
+        width: 100%;
+      }
+
+      .community-form textarea {
+        min-height: 56px;
+        resize: vertical;
+      }
+
+      .community-form {
+        margin-top: 10px;
+      }
+
+      .summary {
+        display: grid;
+        gap: 6px;
+      }
+
+      .item-row {
         display: flex;
         justify-content: space-between;
-        border-bottom: 1px solid #e5e7eb;
+        gap: 12px;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 5px 0;
       }
-      svg {
+
+      table {
         width: 100%;
-        height: 240px;
+        border-collapse: collapse;
       }
-      @media (max-width: 900px) {
-        .grid {
+
+      th,
+      td {
+        border: 1px solid #e2e8f0;
+        padding: 7px;
+        text-align: right;
+      }
+
+      th {
+        background: #f8fafc;
+      }
+
+      .rec-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 8px;
+        background: #fff;
+      }
+
+      .community-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 8px;
+      }
+
+      .community-item {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      .community-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #334155;
+        font-size: 12px;
+      }
+
+      .community-body {
+        margin-top: 8px;
+      }
+
+      .pill {
+        display: inline-block;
+        margin-right: 6px;
+        margin-top: 6px;
+        padding: 2px 8px;
+        border-radius: 100px;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        font-size: 11px;
+      }
+
+      .community-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .ok {
+        color: var(--success);
+      }
+
+      .inline {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .community-filter {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 8px 0 10px;
+      }
+
+      .community-filter select {
+        padding: 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+      }
+
+      @media (max-width: 1000px) {
+        .panel-grid,
+        .kpi-grid {
           grid-template-columns: 1fr;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        #root {
+          padding: 10px;
         }
       }
     </style>
@@ -75,210 +292,679 @@
     <div id="root"></div>
 
     <script type="text/babel">
-      const { useEffect, useMemo, useState } = React;
+      const { useEffect, useState } = React;
 
-      const toMoney = (v) =>
-        new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
+      const CURRENCIES = [
+        { code: "USD", label: "USD" },
+        { code: "KRW", label: "KRW" },
+        { code: "AED", label: "AED" },
+        { code: "EUR", label: "EUR" },
+      ];
 
-      function TrendChart({ data, dataKey, yLabel }) {
-        const width = 560;
-        const height = 230;
-        const pad = 24;
-        const values = data.map((d) => Number(d[dataKey]) || 0);
-        if (!values.length) return <p>No trend data</p>;
+      const toMoney = (value, currency = "USD") => {
+        if (typeof value !== "number") return "-";
+        try {
+          return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(
+            value,
+          );
+        } catch {
+          return `${Number(value).toFixed(0)} ${currency}`;
+        }
+      };
 
-        const minV = Math.min(...values);
-        const maxV = Math.max(...values);
-        const scaleV = maxV === minV ? 1 : maxV - minV;
-        const xStep = (width - pad * 2) / Math.max(data.length - 1, 1);
-        const y = (v) => pad + ((maxV - v) * (height - pad * 2)) / scaleV;
+      const toInt = (value, fallback = 0) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? Math.trunc(n) : fallback;
+      };
 
-        const points = data
-          .map((d, i) => `${pad + i * xStep},${y(d[dataKey])}`)
-          .join(" ");
-        const baselineY = y(minV);
+      const toFloat = (value, fallback = 0) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? Number(n) : fallback;
+      };
+
+      const formatDate = (value) => {
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return "-";
+        return d.toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      };
+
+      function DepreciationTable({ rows }) {
+        return (
+          <table>
+            <thead>
+              <tr>
+                <th>+Year</th>
+                <th>Estimated Value</th>
+                <th>Annual Depreciation</th>
+                <th>Cumulative Depreciation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.year}>
+                  <td>+{row.year}Y</td>
+                  <td>{toMoney(row.estimated_value)}</td>
+                  <td>{toMoney(row.annual_depreciation)}</td>
+                  <td>{toMoney(row.cumulative_depreciation)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        );
+      }
+
+      function CommunityPanel({
+        posts,
+        loading,
+        modeFilter,
+        countryFilter,
+        setModeFilter,
+        setCountryFilter,
+        onRefresh,
+      }) {
+        return (
+          <section className="panel-card">
+            <h3>커뮤니티 피드</h3>
+            <div className="community-filter">
+              <label>
+                모드
+                <select value={modeFilter} onChange={(e) => setModeFilter(e.target.value)}>
+                  <option value="all">전체</option>
+                  <option value="buyer">구매자</option>
+                  <option value="seller">판매자</option>
+                </select>
+              </label>
+              <label>
+                국가
+                <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)}>
+                  <option value="ALL">전체</option>
+                  <option value="KR">KR</option>
+                  <option value="USA">USA</option>
+                  <option value="UAE">UAE</option>
+                  <option value="EU">EU</option>
+                </select>
+              </label>
+              <button onClick={onRefresh}>새로고침</button>
+            </div>
+
+            {loading ? <p>커뮤니티 피드를 불러오는 중입니다...</p> : null}
+            {!loading && posts.length === 0 ? <p>공유된 게시물이 아직 없습니다.</p> : null}
+            <ul className="community-list">
+              {posts.map((post) => (
+                <li key={post.post_id} className="community-item">
+                  <div className="community-meta">
+                    <strong>{post.title}</strong>
+                    <span className="muted">{formatDate(post.created_at)}</span>
+                  </div>
+                  <p className="muted" style={{ margin: "6px 0" }}>
+                    {post.mode === "buyer" ? "구매자 모드" : "판매자 모드"} · {post.country || "N/A"}
+                  </p>
+                  {post.message ? <p style={{ margin: "4px 0" }}>{post.message}</p> : null}
+                  <div>
+                    {(post.tags || []).map((tag) => (
+                      <span className="pill" key={tag}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      }
+
+      function SellerMode({ bootstrap, onSharePost }) {
+        const [form, setForm] = useState({
+          country: "KR",
+          segment: "EV",
+          make: "Hyundai",
+          model: "Ioniq 5",
+          year: 2019,
+          mileage_km: 47000,
+          condition_grade: 8,
+          base_price: 32000,
+          accident_history_severity: 1,
+          regional_demand_factor: 1,
+          purchase_price: 40000,
+          purchase_mileage: 22000,
+          current_mileage: 47000,
+        });
+
+        const [loading, setLoading] = useState(false);
+        const [error, setError] = useState("");
+        const [result, setResult] = useState(null);
+        const [postTitle, setPostTitle] = useState("");
+        const [postMessage, setPostMessage] = useState("");
+        const [postBusy, setPostBusy] = useState(false);
+        const [postNotice, setPostNotice] = useState("");
+
+        const onField = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }));
+
+        useEffect(() => {
+          if (!result) return;
+          setPostTitle(`${result.input.make} ${result.input.model} 판매 견적`);
+          setPostMessage(
+            `예상판매가 ${toMoney(result.valuation.estimated_sale_value)} · 5년 감가상각 참고 가능 · ${result.valuation.depreciation_percent.toFixed(
+              2,
+            )}%`,
+          );
+        }, [result]);
+
+        const onSubmit = async (event) => {
+          event.preventDefault();
+          setLoading(true);
+          setError("");
+          try {
+            const payload = {
+              ...form,
+              year: toInt(form.year),
+              mileage_km: toFloat(form.mileage_km),
+              condition_grade: toInt(form.condition_grade),
+              base_price: toFloat(form.base_price),
+              accident_history_severity: toFloat(form.accident_history_severity),
+              regional_demand_factor: toFloat(form.regional_demand_factor, 1),
+              purchase_price: toFloat(form.purchase_price),
+              purchase_mileage: toFloat(form.purchase_mileage),
+              current_mileage: toFloat(form.current_mileage),
+            };
+            const res = await fetch("/api/v1/valuation/seller-quote", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || "failed");
+            setResult(data);
+          } catch (err) {
+            setError(err.message || "request error");
+          }
+          setLoading(false);
+        };
+
+        const shareResult = async () => {
+          if (!result) return;
+          setPostBusy(true);
+          try {
+            await onSharePost({
+              title: postTitle || `${result.input.make} ${result.input.model} 판매 견적`,
+              message: postMessage,
+              mode: "seller",
+              country: result.input.country,
+              tags: ["SELLER", result.input.segment],
+              snapshot: {
+                mode: "seller",
+                input: result.input,
+                market: result.market,
+                valuation: result.valuation,
+                value_loss: result.value_loss,
+                tips: result.value_retention_tips,
+              },
+            });
+            setPostNotice("커뮤니티 공유 완료");
+            setTimeout(() => setPostNotice(""), 1600);
+          } catch (err) {
+            setError(err.message || "share error");
+          }
+          setPostBusy(false);
+        };
 
         return (
-          <svg viewBox={`0 0 ${width} ${height}`}>
-            <rect x={pad} y={pad} width={width - pad * 2} height={height - pad * 2} fill="#f8fafc" />
-            <polyline
-              fill="none"
-              stroke="#2563eb"
-              strokeWidth="2.8"
-              points={points}
-            />
-            <text x={pad} y={14} fill="#334155" fontSize="12">
-              {yLabel}
-            </text>
-            {data.map((d, i) => {
-              const x = pad + i * xStep;
-              return (
-                <g key={d.month}>
-                  <line x1={x} y1={pad} x2={x} y2={height - pad} stroke="#e2e8f0" />
-                  <text x={x - 10} y={height - 6} fill="#475569" fontSize="11">
-                    {d.month}
-                  </text>
-                </g>
-              );
-            })}
-            <line x1={pad} y1={height - pad} x2={width - pad} y2={height - pad} stroke="#94a3b8" />
-            <line x1={pad} y1={pad} x2={pad} y2={height - pad} stroke="#94a3b8" />
-            <text x={width - 120} y={pad + 16} fill="#334155" fontSize="11">
-              min {minV.toFixed(2)}
-            </text>
-            <text x={width - 120} y={height - 12} fill="#334155" fontSize="11">
-              max {maxV.toFixed(2)}
-            </text>
-            <path d={`M ${pad} ${baselineY} L ${width - pad} ${baselineY}`} stroke="#e2e8f0" />
-          </svg>
+          <div className="panel-grid">
+            <section className="panel-card">
+              <h3>판매자 입력</h3>
+              <form onSubmit={onSubmit} className="form-grid">
+                <label>
+                  국가 코드
+                  <input value={form.country} onChange={onField("country")} />
+                </label>
+                <label>
+                  세그먼트
+                  <input value={form.segment} onChange={onField("segment")} />
+                </label>
+                <label>
+                  연식
+                  <input value={form.year} onChange={onField("year")} />
+                </label>
+                <label>
+                  제조사
+                  <input value={form.make} onChange={onField("make")} />
+                </label>
+                <label>
+                  모델
+                  <input value={form.model} onChange={onField("model")} />
+                </label>
+                <label>
+                  주행거리(km)
+                  <input value={form.mileage_km} onChange={onField("mileage_km")} />
+                </label>
+                <label>
+                  컨디션(1~10)
+                  <input value={form.condition_grade} onChange={onField("condition_grade")} />
+                </label>
+                <label>
+                  사고심각도(0~5)
+                  <input value={form.accident_history_severity} onChange={onField("accident_history_severity")} />
+                </label>
+                <label>
+                  기준가(USD)
+                  <input value={form.base_price} onChange={onField("base_price")} />
+                </label>
+                <label>
+                  구매가(USD)
+                  <input value={form.purchase_price} onChange={onField("purchase_price")} />
+                </label>
+                <label>
+                  구매 당시 주행거리(km)
+                  <input value={form.purchase_mileage} onChange={onField("purchase_mileage")} />
+                </label>
+                <label>
+                  현재 주행거리(km)
+                  <input value={form.current_mileage} onChange={onField("current_mileage")} />
+                </label>
+                <label>
+                  지역 수요 가중치
+                  <input value={form.regional_demand_factor} onChange={onField("regional_demand_factor")} />
+                </label>
+                <div className="button-row" style={{ gridColumn: "span 3" }}>
+                  <button type="submit" disabled={loading}>
+                    {loading ? "계산 중..." : "판매 견적 계산"}
+                  </button>
+                </div>
+              </form>
+
+              {error ? <p style={{ color: "#b91c1c" }}>{error}</p> : null}
+              {!result ? (
+                <p className="muted">차량 정보를 입력하면 판매 예상가와 손실 요인을 계산합니다.</p>
+              ) : (
+                <div className="summary" style={{ marginTop: 10 }}>
+                  <div className="item-row">
+                    <span>예상 판매가</span>
+                    <strong>{toMoney(result.valuation.estimated_sale_value)}</strong>
+                  </div>
+                  <div className="item-row">
+                    <span>총 감가</span>
+                    <span>{toMoney(result.valuation.total_depreciation)}</span>
+                  </div>
+                  <div className="item-row">
+                    <span>감가율</span>
+                    <span>{result.valuation.depreciation_percent.toFixed(2)}%</span>
+                  </div>
+                  <div className="item-row">
+                    <span>1,000km당 손실</span>
+                    <span>{toMoney(result.value_loss.per_1000km)}</span>
+                  </div>
+                  <div className="item-row">
+                    <span>예상 판매 가능 기간</span>
+                    <span>{result.time_to_sell_days}일</span>
+                  </div>
+                  <p className="muted">요약 사유</p>
+                  <ul>
+                    {result.valuation.valuation_reasons.map((reason) => (
+                      <li key={reason.factor}>
+                        {reason.factor} · {toMoney(reason.impact_usd)} · {reason.description}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
+
+            <section className="panel-card">
+              <h3>5년 감가상각표</h3>
+              {!result ? <p className="muted">차량 계산을 먼저 실행해 주세요.</p> : <DepreciationTable rows={result.valuation.depreciation_projection_5y || []} />}
+
+              <h3 style={{ marginTop: 12 }}>커뮤니티 공유</h3>
+              <p className="muted">판매 견적 결과를 피드에 공유하면 구매자와 판매자에게 참고가 됩니다.</p>
+              <div className="community-form">
+                <label>
+                  제목
+                  <input value={postTitle} onChange={(e) => setPostTitle(e.target.value)} />
+                </label>
+                <label>
+                  내용
+                  <textarea value={postMessage} onChange={(e) => setPostMessage(e.target.value)} />
+                </label>
+                <div className="button-row">
+                  <button onClick={shareResult} disabled={!result || postBusy}>
+                    {postBusy ? "공유 중..." : "이 결과 공유"}
+                  </button>
+                  {postNotice ? <span className="ok">{postNotice}</span> : null}
+                </div>
+              </div>
+            </section>
+          </div>
+        );
+      }
+
+      function BuyerMode({ bootstrap, onSharePost }) {
+        const [form, setForm] = useState({
+          age: bootstrap?.user?.age || 29,
+          country: bootstrap?.user?.country || "KR",
+          budget_min_local: 15000,
+          budget_max_local: 38000,
+          currency_code: "KRW",
+          occupation: bootstrap?.user?.occupation || "",
+          annual_income_usd: bootstrap?.user?.annual_income_usd || 54000,
+          is_urban: true,
+          preferred_car_segments: bootstrap?.user?.preferred_car_segments?.join(",") || "",
+        });
+
+        const [loading, setLoading] = useState(false);
+        const [error, setError] = useState("");
+        const [result, setResult] = useState(null);
+        const [postBusyId, setPostBusyId] = useState("");
+
+        const onField = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }));
+        const onCheckbox = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.checked }));
+
+        const onSubmit = async (event) => {
+          event.preventDefault();
+          setLoading(true);
+          setError("");
+          try {
+            const payload = {
+              ...form,
+              age: toInt(form.age),
+              budget_min_local: toFloat(form.budget_min_local),
+              budget_max_local: toFloat(form.budget_max_local),
+              annual_income_usd: toFloat(form.annual_income_usd),
+              preferred_car_segments: form.preferred_car_segments
+                .split(",")
+                .map((segment) => segment.trim().toUpperCase())
+                .filter(Boolean),
+            };
+            const res = await fetch("/api/v1/recommendations/buyer/custom", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || "failed");
+            setResult(data);
+          } catch (err) {
+            setError(err.message || "request error");
+          }
+          setLoading(false);
+        };
+
+        const shareRecommendation = async (rec) => {
+          setPostBusyId(rec.vehicle_id);
+          const recommendationMessage = rec.reasons?.join(" · ") || "감가상각 기준으로 자동 추천된 차량입니다.";
+          try {
+            await onSharePost({
+              title: `${rec.make} ${rec.model} 추천 (${rec.segment})`,
+              message: `예산 구간 기반 추천 | ${recommendationMessage}`,
+              mode: "buyer",
+              country: rec.country,
+              tags: ["BUYER", "RECOMMEND", rec.segment],
+              snapshot: {
+                recommendation: rec,
+                budget: result?.budget_usd,
+                personalized_budget: result?.personalized_budget,
+              },
+            });
+          } finally {
+            setPostBusyId("");
+          }
+        };
+
+        return (
+          <div className="panel-grid">
+            <section className="panel-card">
+              <h3>구매자 입력</h3>
+              <form onSubmit={onSubmit} className="form-grid">
+                <label>
+                  나이
+                  <input value={form.age} onChange={onField("age")} />
+                </label>
+                <label>
+                  거주 국가
+                  <select value={form.country} onChange={onField("country")}>
+                    <option value="KR">KR</option>
+                    <option value="USA">USA</option>
+                    <option value="UAE">UAE</option>
+                    <option value="EU">EU</option>
+                  </select>
+                </label>
+                <label>
+                  선호 통화
+                  <select value={form.currency_code} onChange={onField("currency_code")}>
+                    {CURRENCIES.map((currency) => (
+                      <option key={currency.code} value={currency.code}>
+                        {currency.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  예산 최소(로컬)
+                  <input value={form.budget_min_local} onChange={onField("budget_min_local")} />
+                </label>
+                <label>
+                  예산 최대(로컬)
+                  <input value={form.budget_max_local} onChange={onField("budget_max_local")} />
+                </label>
+                <label>
+                  직업 키워드
+                  <input value={form.occupation} onChange={onField("occupation")} />
+                </label>
+                <label>
+                  연간 소득(USD)
+                  <input value={form.annual_income_usd} onChange={onField("annual_income_usd")} />
+                </label>
+                <label>
+                  선호 세그먼트(콤마구분)
+                  <input value={form.preferred_car_segments} onChange={onField("preferred_car_segments")} />
+                </label>
+                <label className="inline" style={{ flexDirection: "row", alignItems: "center", gridColumn: "span 3" }}>
+                  <span>도심형 사용자</span>
+                  <input type="checkbox" checked={form.is_urban} onChange={onCheckbox("is_urban")} />
+                </label>
+                <div className="button-row" style={{ gridColumn: "span 3" }}>
+                  <button type="submit" disabled={loading}>
+                    {loading ? "추천 계산 중..." : "맞춤 추천 조회"}
+                  </button>
+                </div>
+              </form>
+
+              {error ? <p style={{ color: "#b91c1c" }}>{error}</p> : null}
+              {!result ? (
+                <p className="muted">예산과 프로필 입력 후 추천 차량을 받으세요.</p>
+              ) : (
+                <div className="summary" style={{ marginTop: 8 }}>
+                  <div className="item-row">
+                    <span>예산(USD)</span>
+                    <strong>
+                      {toMoney(result.budget_usd.min)} ~ {toMoney(result.budget_usd.max)}
+                    </span>
+                  </div>
+                  <div className="item-row">
+                    <span>환율 적용</span>
+                    <span>{result.budget_input.usd_rate}</span>
+                  </div>
+                  <div className="item-row">
+                    <span>개인화 예산 여력</span>
+                    <span>{toMoney(result.personalized_budget)}</span>
+                  </div>
+                  <p className="muted">선호 세그먼트: {result.preferred_segments.join(", ")}</p>
+                  <p className="muted">추천 수: {result.count}</p>
+                </div>
+              )}
+            </section>
+
+            <section className="panel-card">
+              <h3>추천 차량</h3>
+              {!result ? <p className="muted">추천 입력을 먼저 진행해 주세요.</p> : null}
+              {!result || result.recommendations.length === 0 ? (
+                result ? <p>입력 조건에 맞는 차량이 없습니다.</p> : null
+              ) : (
+                result.recommendations.map((rec) => (
+                  <div key={rec.vehicle_id} className="rec-card">
+                    <div className="item-row">
+                      <span>
+                        {rec.make} {rec.model} ({rec.year})
+                      </span>
+                      <strong>{toMoney(rec.current_value)}</strong>
+                    </div>
+                    <div className="item-row">
+                      <span>추천 점수</span>
+                      <span>{rec.score}</span>
+                    </div>
+                    <div className="item-row">
+                      <span>적정 공정가</span>
+                      <span>
+                        {toMoney(rec.fair_value_band.low)} ~ {toMoney(rec.fair_value_band.high)}
+                      </span>
+                    </div>
+                    <p className="muted">추천 이유</p>
+                    <ul>
+                      {(rec.reasons || []).map((reason) => (
+                        <li key={reason}>{reason}</li>
+                      ))}
+                    </ul>
+                    <DepreciationTable rows={rec.depreciation_projection_5y || []} />
+                    <div className="button-row" style={{ marginTop: 6 }}>
+                      <button onClick={() => shareRecommendation(rec)} disabled={postBusyId === rec.vehicle_id}>
+                        {postBusyId === rec.vehicle_id ? "공유 중..." : "이 추천 공유"}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </section>
+          </div>
         );
       }
 
       function App() {
         const [mode, setMode] = useState("buyer");
         const [bootstrap, setBootstrap] = useState(null);
-        const [buyerList, setBuyerList] = useState([]);
-        const [sellerPayload, setSellerPayload] = useState(null);
+        const [communityPosts, setCommunityPosts] = useState([]);
+        const [communityLoading, setCommunityLoading] = useState(false);
+        const [communityModeFilter, setCommunityModeFilter] = useState("all");
+        const [communityCountryFilter, setCommunityCountryFilter] = useState("ALL");
+
+        const loadCommunity = async () => {
+          setCommunityLoading(true);
+          try {
+            const q = new URLSearchParams();
+            if (communityModeFilter !== "all") q.set("mode", communityModeFilter);
+            if (communityCountryFilter !== "ALL") q.set("country", communityCountryFilter);
+            const endpoint = `/api/v1/community/posts?${q.toString()}`;
+            const data = await fetch(endpoint).then((res) => res.json());
+            setCommunityPosts(data.posts || []);
+          } catch {
+            setCommunityPosts([]);
+          }
+          setCommunityLoading(false);
+        };
+
+        const onSharePost = async ({ title, message, mode: shareMode, country, tags, snapshot }) => {
+          const payload = {
+            title,
+            message,
+            mode: shareMode,
+            country: country || "",
+            tags: tags || [],
+            snapshot: snapshot || {},
+          };
+          const res = await fetch("/api/v1/community/posts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || "failed");
+          await loadCommunity();
+          setCommunityPosts((prev) => [data, ...prev].slice(0, 40));
+        };
 
         useEffect(() => {
           (async () => {
-            const b = await fetch("/api/v1/demo/bootstrap").then((r) => r.json());
-            setBootstrap(b);
+            const data = await fetch("/api/v1/demo/bootstrap").then((r) => r.json());
+            setBootstrap(data);
           })();
         }, []);
 
         useEffect(() => {
-          if (!bootstrap?.user) return;
-          const userId = bootstrap.user.user_id;
-          if (mode === "buyer") {
-            (async () => {
-              const res = await fetch(
-                `/api/v1/recommendations/buyer?user_id=${encodeURIComponent(
-                  userId
-                )}&top_k=6`
-              ).then((r) => r.json());
-              setBuyerList(res.recommendations || []);
-              setSellerPayload(null);
-            })();
-          } else {
-            (async () => {
-              const vehicleId = bootstrap.vehicle_id;
-              const owned = bootstrap.owned_vehicle || {};
-              const res = await fetch(
-                `/api/v1/recommendations/seller/${encodeURIComponent(
-                  vehicleId
-                )}?user_id=${encodeURIComponent(userId)}&purchase_price=${
-                  owned.purchase_price || 0
-                }&purchase_mileage=${owned.purchase_mileage || 0}&current_mileage=${
-                  owned.current_mileage || 0
-                }`
-              ).then((r) => r.json());
-              setSellerPayload(res);
-              setBuyerList([]);
-            })();
-          }
-        }, [mode, bootstrap]);
+          loadCommunity();
+        }, [communityModeFilter, communityCountryFilter]);
 
-        const user = bootstrap?.user;
-        const trend = bootstrap?.market_trend || [];
-        const preferredSegments = useMemo(() => {
-          if (!user?.preferred_car_segments) return [];
-          return user.preferred_car_segments.join(", ");
-        }, [user]);
-
-        if (!bootstrap || !user) {
-          return <p>Loading dashboard…</p>;
+        if (!bootstrap) {
+          return <p>loading...</p>;
         }
 
-        const budget = bootstrap?.personalized_budget ?? 12000;
-        const vehicleIds = (bootstrap.listings || []).map((x) => x.vehicle_id).join(", ");
         return (
-          <div>
-            <header className="toolbar">
-              <h2>Used Car Valuation Dashboard</h2>
+          <div className="app-shell">
+            <div className="topbar">
               <div>
-                <button
-                  className={mode === "buyer" ? "active" : ""}
-                  onClick={() => setMode("buyer")}
-                >
-                  Buyer Mode
-                </button>
-                <button
-                  className={mode === "seller" ? "active" : ""}
-                  onClick={() => setMode("seller")}
-                >
-                  Seller Mode
-                </button>
+                <h2 style={{ marginBottom: 6 }}>Used Car Valuation & Marketplace</h2>
+                <p className="muted" style={{ marginBottom: 0 }}>
+                  Demo User · Country: {bootstrap.user.country} · Age: {bootstrap.user.age}
+                </p>
               </div>
-            </header>
+              <div className="toolbar">
+                <div className="button-row">
+                  <button className={mode === "buyer" ? "active" : ""} onClick={() => setMode("buyer")}>
+                    Buyer Mode
+                  </button>
+                  <button className={mode === "seller" ? "active" : ""} onClick={() => setMode("seller")}>
+                    Seller Mode
+                  </button>
+                </div>
+                <div>
+                  <span className="muted">총 개인화 예산(USD): </span>
+                  <strong>{toMoney(bootstrap.personalized_budget)}</strong>
+                </div>
+              </div>
+            </div>
 
-            <section className="meta">
-              <p>
-                User {user.user_id.slice(0, 8)} · Country: {user.country} · Age: {user.age}
-              </p>
-              <p>
-                Personalized budget: {toMoney(budget)} · Segments: {preferredSegments}
-              </p>
-              <p>Available listings count: {bootstrap.listings.length}</p>
+            <section className="panel-card summary">
+              <div className="kpi-grid">
+                <div className="kpi">
+                  <span className="muted">선호 세그먼트</span>
+                  <p>
+                    <strong>{bootstrap.user.preferred_car_segments.join(", ") || "미설정"}</strong>
+                  </p>
+                </div>
+                <div className="kpi">
+                  <span className="muted">기본 지역</span>
+                  <p>
+                    <strong>{bootstrap.user.country}</strong>
+                  </p>
+                </div>
+                <div className="kpi">
+                  <span className="muted">샘플 차량</span>
+                  <p>
+                    <strong>{bootstrap.vehicle_id ? "READY" : "-"}</strong>
+                  </p>
+                </div>
+                <div className="kpi">
+                  <span className="muted">커뮤니티 공유</span>
+                  <p>
+                    <strong>{communityPosts.length}</strong>
+                  </p>
+                </div>
+              </div>
             </section>
 
-            {mode === "buyer" ? (
-              <section className="grid">
-                <article className="card">
-                  <h3>Best Value Recommendations</h3>
-                  {buyerList.length === 0 ? (
-                    <p>No recommendations for current filters.</p>
-                  ) : (
-                    buyerList.map((rec) => (
-                      <div key={rec.vehicle_id} className="item">
-                        <span>
-                          {rec.title} · {rec.segment}
-                        </span>
-                        <strong>
-                          {toMoney(rec.price_usd)} · score {rec.score}
-                        </strong>
-                      </div>
-                    ))
-                  )}
-                </article>
-
-                <article className="card">
-                  <h3>Regional Price Trend</h3>
-                  <TrendChart data={trend} dataKey="avg_price" yLabel="avg_price" />
-                </article>
-              </section>
-            ) : (
-              <section className="grid">
-                <article className="card">
-                  <h3>Value Loss Tracker</h3>
-                  {!sellerPayload ? (
-                    <p>Waiting on seller forecast…</p>
-                  ) : (
-                    <>
-                      <p>
-                        Net return range: {toMoney(sellerPayload.expected_net_return_range.low)} ~{" "}
-                        {toMoney(sellerPayload.expected_net_return_range.high)}
-                      </p>
-                      <p>Time to sell: {sellerPayload.time_to_sell_days} days</p>
-                      <p>Loss total: {toMoney(sellerPayload.value_loss.total)}</p>
-                      <p>Loss per 1,000 km: {toMoney(sellerPayload.value_loss.per_1000km)}</p>
-                    </>
-                  )}
-                </article>
-                <article className="card">
-                  <h3>Optimal Selling Time</h3>
-                  {!sellerPayload ? (
-                    <p>Waiting on demand forecast…</p>
-                  ) : (
-                    <>
-                      <p>Market demand index: {sellerPayload.market_demand}</p>
-                      <p>Tracked vehicles: {vehicleIds}</p>
-                      <TrendChart data={trend} dataKey="demand" yLabel="demand_index" />
-                    </>
-                  )}
-                </article>
-              </section>
-            )}
+            <div>{mode === "buyer" ? <BuyerMode bootstrap={bootstrap} onSharePost={onSharePost} /> : <SellerMode bootstrap={bootstrap} onSharePost={onSharePost} />}</div>
+            <CommunityPanel
+              posts={communityPosts}
+              loading={communityLoading}
+              modeFilter={communityModeFilter}
+              countryFilter={communityCountryFilter}
+              setModeFilter={setCommunityModeFilter}
+              setCountryFilter={setCommunityCountryFilter}
+              onRefresh={loadCommunity}
+            />
           </div>
         );
       }
